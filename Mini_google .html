@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniGoogle 1998</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 450px;
+        }
+        /* Emulate older link styles */
+        .result-link {
+            color: #0000cc;
+            text-decoration: underline;
+        }
+        .result-url {
+            color: #008000;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col pb-12">
+
+    <!-- Header Section -->
+    <header class="flex flex-col items-center pt-16 pb-6">
+        <div class="flex items-baseline mb-4">
+            <h1 class="text-6xl font-bold tracking-tighter">
+                <span class="text-blue-600">M</span><span class="text-red-600">i</span><span class="text-yellow-500">n</span><span class="text-blue-600">i</span><span class="text-green-600">G</span><span class="text-red-600">o</span><span class="text-yellow-500">o</span><span class="text-blue-600">g</span><span class="text-green-600">l</span><span class="text-red-600">e</span>
+            </h1>
+            <span class="text-gray-500 text-lg ml-2">1998</span>
+        </div>
+
+        <!-- Search Area -->
+        <div class="w-full max-w-2xl flex flex-col sm:flex-row items-center justify-center gap-3 px-4">
+            <input
+                type="text"
+                id="searchInput"
+                class="search-input border border-gray-400 p-1 shadow-inner focus:outline-none focus:border-blue-500 text-lg"
+                placeholder="Search..."
+            />
+            <div class="flex gap-2 w-full sm:w-auto justify-center">
+                <button
+                    id="searchBtn"
+                    class="bg-[#e5e5e5] border border-gray-400 px-4 py-1 hover:bg-[#d5d5d5] active:bg-[#c5c5c5] text-black text-sm"
+                >
+                    Search
+                </button>
+                <button
+                    id="addPagesBtn"
+                    class="bg-[#e5e5e5] border border-gray-400 px-4 py-1 hover:bg-[#d5d5d5] active:bg-[#c5c5c5] text-red-800 text-sm whitespace-nowrap"
+                >
+                    Add 3 fake pages
+                </button>
+            </div>
+        </div>
+        
+        <p id="indexCount" class="text-gray-500 text-xs mt-4">
+            Currently indexing 6 pages.
+        </p>
+    </header>
+
+    <!-- Results Section -->
+    <main class="max-w-5xl mx-auto px-4 w-full mt-4 flex-grow">
+        
+        <div id="messageArea" class="text-center mt-10">
+            <p class="text-gray-600">Enter a keyword above to search the web (e.g., "pizza", "pune", "food").</p>
+        </div>
+
+        <div id="resultsArea" class="hidden flex-col md:flex-row w-full gap-8 border-t border-gray-300 pt-8 mt-4">
+            
+            <!-- OLD WAY COLUMN -->
+            <div class="flex-1">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-red-700 m-0">Old way</h2>
+                    <p class="text-xs text-gray-600 m-0">How many times the word appears</p>
+                </div>
+                <div id="oldWayResults" class="flex flex-col gap-5">
+                    <!-- Results injected here -->
+                </div>
+            </div>
+
+            <!-- PAGERANK WAY COLUMN -->
+            <div class="flex-1 border-t md:border-t-0 md:border-l border-gray-300 md:pl-8 pt-8 md:pt-0 mt-8 md:mt-0">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-green-700 m-0">PageRank way</h2>
+                    <p class="text-xs text-gray-600 m-0">How often a random surfer visits</p>
+                </div>
+                <div id="newWayResults" class="flex flex-col gap-5">
+                    <!-- Results injected here -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Educational Explanation Section -->
+    <footer class="max-w-4xl mx-auto px-4 mt-16 p-4 bg-[#f0f0f0] border border-gray-300 text-sm text-black">
+        <h3 class="text-base font-bold mb-3">How MiniGoogle Works</h3>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div>
+                <h4 class="font-bold text-red-700 mb-1">OLD WAY – Keyword Frequency</h4>
+                <p class="mb-2 leading-snug">
+                    Before Google, early search engines simply counted how many times your search term appeared on a webpage. 
+                    More occurrences meant a higher ranking.
+                </p>
+                <p class="italic text-xs text-gray-600">
+                    Flaw: Webmasters could easily cheat by stuffing invisible keywords (e.g., repeating "pizza" 100 times).
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-green-700 mb-1">NEW WAY – PageRank</h4>
+                <p class="mb-2 leading-snug">
+                    Google introduced PageRank. Instead of just reading text, it looks at the <strong>links</strong> connecting websites. 
+                    A link from Page A to Page B is counted as a "vote" of importance.
+                </p>
+                <p class="italic text-xs text-gray-600">
+                    Benefit: It simulates a random surfer clicking links. Pages receiving links from other important pages get a higher score, yielding much better results.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- INITIAL DATABASE ---
+        let pages = [
+            { url: 'pune-food-guide.com', title: 'Pune Food Guide', text: 'Find the best street food and pizza in Pune.', outgoingLinks: ['best-pizza-pune.com', 'cheap-eats-pune.com'] },
+            { url: 'best-pizza-pune.com', title: 'Best Pizza in Pune', text: 'We review the top pizza places for college students.', outgoingLinks: ['pizza-pizza-pizza.com', 'college-canteen-blog.com'] },
+            { url: 'college-canteen-blog.com', title: 'College Canteen Blog', text: 'What is cooking in the college canteen today? Mostly pizza.', outgoingLinks: ['pune-food-guide.com'] },
+            { url: 'pizza-recipes-home.com', title: 'Home Pizza Recipes', text: 'Make cheap eats and pizza at home.', outgoingLinks: ['cheap-eats-pune.com'] },
+            { url: 'cheap-eats-pune.com', title: 'Cheap Eats Pune', text: 'Food guide for cheap eats and college food.', outgoingLinks: ['pune-food-guide.com'] },
+            { url: 'pizza-pizza-pizza.com', title: 'Pizza Pizza Pizza', text: 'Pizza food pizza delicious pizza!', outgoingLinks: [] }
+        ];
+
+        let fakePageCount = 0;
+        let pageRanks = {};
+
+        // --- ALGORITHMS ---
+
+        // 1. PageRank Calculation
+        function calculatePageRank() {
+            const iterations = 20;
+            const dampingFactor = 0.85;
+            const N = pages.length;
+            
+            if (N === 0) return {};
+
+            let pr = {};
+            // Initialize
+            pages.forEach(p => { pr[p.url] = 1 / N; });
+
+            for (let i = 0; i < iterations; i++) {
+                const newPr = {};
+                let sinkRank = 0;
+
+                // Identify sink nodes (no outgoing links) and distribute base rank
+                pages.forEach(p => {
+                    if (!p.outgoingLinks || p.outgoingLinks.length === 0) {
+                        sinkRank += pr[p.url];
+                    }
+                    newPr[p.url] = (1 - dampingFactor) / N;
+                });
+
+                // Distribute rank through links
+                pages.forEach(p => {
+                    // Add teleportation from sink nodes evenly
+                    newPr[p.url] += (dampingFactor * sinkRank) / N;
+
+                    if (p.outgoingLinks && p.outgoingLinks.length > 0) {
+                        const share = pr[p.url] / p.outgoingLinks.length;
+                        p.outgoingLinks.forEach(targetUrl => {
+                            if (newPr[targetUrl] !== undefined) {
+                                newPr[targetUrl] += dampingFactor * share;
+                            }
+                        });
+                    }
+                });
+                pr = newPr;
+            }
+            return pr;
+        }
+
+        // 2. Keyword Frequency Calculation
+        function getKeywordFrequency(page, query) {
+            if (!query.trim()) return 0;
+            const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+            const textToSearch = (page.title + ' ' + page.text).toLowerCase();
+            
+            let totalMatches = 0;
+            terms.forEach(term => {
+                const regex = new RegExp(term, 'g');
+                const matches = textToSearch.match(regex);
+                if (matches) {
+                    totalMatches += matches.length;
+                }
+            });
+            return totalMatches;
+        }
+
+
+        // --- UI LOGIC ---
+
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const addPagesBtn = document.getElementById('addPagesBtn');
+        const messageArea = document.getElementById('messageArea');
+        const resultsArea = document.getElementById('resultsArea');
+        const oldWayResults = document.getElementById('oldWayResults');
+        const newWayResults = document.getElementById('newWayResults');
+        const indexCount = document.getElementById('indexCount');
+
+        function renderResults(query) {
+            if (!query.trim()) {
+                messageArea.innerHTML = '<p class="text-gray-600">Enter a keyword above to search the web (e.g., "pizza", "pune", "food").</p>';
+                messageArea.classList.remove('hidden');
+                resultsArea.classList.add('hidden');
+                return;
+            }
+
+            // Find matching pages
+            const matchingPages = pages.filter(page => getKeywordFrequency(page, query) > 0);
+
+            if (matchingPages.length === 0) {
+                messageArea.innerHTML = `<p class="text-red-700 font-bold">No pages found. Try: pizza, food, pune</p>`;
+                messageArea.classList.remove('hidden');
+                resultsArea.classList.add('hidden');
+                return;
+            }
+
+            messageArea.classList.add('hidden');
+            resultsArea.classList.remove('hidden');
+            resultsArea.style.display = 'flex'; // override tailwind hidden
+
+            // Old Way: Sort by Keyword Frequency
+            const oldWay = [...matchingPages].sort((a, b) => {
+                return getKeywordFrequency(b, query) - getKeywordFrequency(a, query);
+            });
+
+            // New Way: Sort by PageRank
+            const newWay = [...matchingPages].sort((a, b) => {
+                return (pageRanks[b.url] || 0) - (pageRanks[a.url] || 0);
+            });
+
+            // Render Old Way
+            oldWayResults.innerHTML = oldWay.map(page => `
+                <div class="flex flex-col">
+                    <a href="#${page.url}" class="result-link text-lg font-medium">${page.title}</a>
+                    <span class="result-url">${page.url}</span>
+                    <p class="text-sm mt-1 text-black">${page.text}</p>
+                    <div class="text-xs text-gray-500 mt-1">Score: ${getKeywordFrequency(page, query)}</div>
+                </div>
+            `).join('');
+
+            // Render New Way
+            newWayResults.innerHTML = newWay.map(page => `
+                <div class="flex flex-col">
+                    <a href="#${page.url}" class="result-link text-lg font-medium">${page.title}</a>
+                    <span class="result-url">${page.url}</span>
+                    <p class="text-sm mt-1 text-black">${page.text}</p>
+                    <div class="text-xs text-gray-500 mt-1">Score: ${(pageRanks[page.url] || 0).toFixed(4)}</div>
+                </div>
+            `).join('');
+        }
+
+        function handleSearch() {
+            const query = searchInput.value;
+            renderResults(query);
+        }
+
+        function handleAddFakePages() {
+            const topics = ['pizza', 'food', 'college', 'Pune', 'cheap eats'];
+            const descriptions = [
+                'We discuss the best places to eat around town.',
+                'A detailed review of local food joints.',
+                'Eating out on a budget is easy if you know where to look.',
+                'The ultimate guide for college students who love pizza.',
+                'Discovering hidden culinary gems in the city.'
+            ];
+
+            for (let i = 1; i <= 3; i++) {
+                fakePageCount++;
+                const newUrl = `generated-page-${fakePageCount}.com`;
+                
+                // Randomly link to 1 to 3 existing pages
+                const shuffledExisting = [...pages].sort(() => 0.5 - Math.random());
+                const numLinks = Math.floor(Math.random() * 3) + 1;
+                const outgoingLinks = shuffledExisting.slice(0, numLinks).map(p => p.url);
+
+                const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+                const randomDesc = descriptions[Math.floor(Math.random() * descriptions.length)];
+
+                pages.push({
+                    url: newUrl,
+                    title: `Fake Page ${fakePageCount}: ${randomTopic}`,
+                    text: `${randomDesc} Mostly focusing on ${randomTopic}.`,
+                    outgoingLinks: outgoingLinks
+                });
+            }
+
+            // Recalculate PageRank with new pages
+            pageRanks = calculatePageRank();
+            
+            // Update UI
+            indexCount.innerText = `Currently indexing ${pages.length} pages.`;
+            
+            // Re-render if there's an active search
+            if (searchInput.value.trim() !== '') {
+                handleSearch();
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        searchBtn.addEventListener('click', handleSearch);
+        
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+
+        addPagesBtn.addEventListener('click', handleAddFakePages);
+
+        // --- INITIALIZATION ---
+        // Calculate PageRank on initial load
+        pageRanks = calculatePageRank();
+
+    </script>
+</body>
+</html>
